@@ -7,6 +7,11 @@
 #include <list>
 #include <iterator>
 
+struct TrueType {
+	static constexpr bool value = true;
+};
+
+
 void sort(std::vector<int>::iterator, std::vector<int>::iterator, int);
 void sort(std::vector<int>&, int);
 bool areEqual(std::vector<int>, std::vector<int>);
@@ -22,7 +27,10 @@ void powTest();
 void isSortedTest();
 
 template <class iter> 
-struct is_bidirectional_iter : std::is_same< typename std::iterator_traits<iter>::iterator_category, std::bidirectional_iterator_tag>::value {};
+struct is_bidirectional_iter : std::is_same< typename std::iterator_traits<iter>::iterator_category, std::bidirectional_iterator_tag> {};
+
+template <class iter, class T = void>
+struct enable_if_bidirectional : std::enable_if<is_bidirectional_iter<iter>::value, T> {};
 
 template <class Iter>
 typename std::enable_if<std::is_same< typename std::iterator_traits<Iter>::iterator_category, std::random_access_iterator_tag>::value>::type 
@@ -38,7 +46,7 @@ print(Iter start, Iter end)
 }
 
 template <class Iter>
-typename std::enable_if<std::is_same< typename std::iterator_traits<Iter>::iterator_category, std::bidirectional_iterator_tag>::value>::type
+typename enable_if_bidirectional<Iter>::type
 print(Iter start, Iter end)
 {
 	auto it = start;
@@ -48,18 +56,6 @@ print(Iter start, Iter end)
 		it++;
 	}
 	std::cout << "Bidirectional iterator version" << std::endl;
-}
-
-template< class BDIter >
-void alg(BDIter, BDIter, std::bidirectional_iterator_tag)
-{
-	std::cout << "alg() called for bidirectional iterator\n";
-}
-
-template <class RAIter>
-void alg(RAIter, RAIter, std::random_access_iterator_tag)
-{
-	std::cout << "alg() called for random-access iterator\n";
 }
 
 template <class T>
